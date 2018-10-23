@@ -16,3 +16,9 @@ java
 6.spring缓存方向
 
 7.图片上传base64  流   OSS
+
+json
+
+http请求
+
+经常用到的判断

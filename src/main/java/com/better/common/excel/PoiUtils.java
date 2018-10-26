@@ -1,17 +1,24 @@
 package com.better.common.excel;
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import com.better.anno.bean.Excel;
+import com.better.anno.bean.ExcelProperty;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.*;
 
 import static org.apache.poi.ss.usermodel.CellType.NUMERIC;
 
@@ -182,6 +189,222 @@ public class PoiUtils {
             }
         } catch (IOException e) {
             logger.error(e.getMessage());
+        }
+        return workbook;
+    }
+
+    /**
+     * 单个sheet导出Excel
+     * @param tList 数据
+     * @param fileName Excel名称
+     * @param charsetName 编码格式
+     * @return response响应流
+     */
+    public static ResponseEntity<byte[]> downToExcel(List<?> tList, String fileName, String charsetName) {
+        try {
+            byte[] bytes = PoiUtils.beanToExcelBytes(tList);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            //转换编码 防止页面乱码
+            headers.setContentDispositionFormData("attachment", new String(fileName.getBytes("utf-8"), charsetName));
+            return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * 导出Excel文件（单个）
+     * @param tList 数据
+     * @param <T> 泛型
+     * @return byte字节数组
+     */
+    public static <T> byte[] beanToExcelBytes(List<T> tList) {
+        //创建byte[]数组用于后面存储
+        byte[] bytes = new byte[0];
+        //创建workbook
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        //判断用户传入有无数据
+        if (tList != null && !tList.isEmpty()) {
+            workbook = commonExcelCode(tList, workbook);
+            //缓冲区
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try {
+                workbook.write(baos);
+                bytes = baos.toByteArray();
+            } catch (IOException e) {
+                logger.error("", e);
+            } finally {
+                try {
+                    baos.close();
+                    workbook.close();
+                } catch (IOException e) {
+                    logger.error("", e);
+                }
+            }
+        }
+        return bytes;
+    }
+
+    /**
+     * 多个sheet导出Excel
+     * @param tList 数据
+     * @param fileName Excel名称
+     * @param charsetName 编码格式
+     * @return response响应流
+     */
+    public static ResponseEntity<byte[]> downToExcelMore(List<List<?>> tList, String fileName, String charsetName) {
+        try {
+            //调用多sheet方法
+            byte[] bytes = PoiUtils.beanToExcelMoreBytes(tList);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            //转换编码 防止页面乱码
+            headers.setContentDispositionFormData("attachment", new String(fileName.getBytes("utf-8"), charsetName));
+            return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * 导出Excel文件（多个）
+     * @param tList 数据
+     * @param <T> 泛型
+     * @return 返回bytes字节
+     */
+    public static <T> byte[] beanToExcelMoreBytes(List<List<?>> tList) {
+        //创建byte[]数组用于后面存储
+        byte[] bytes = new byte[0];
+        //创建workbook
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        //判断用户传入有无数据
+        if (tList != null && !tList.isEmpty()) {
+            //从这就开始循环了····
+            for (List list01 : tList){
+                if(list01 != null && !list01.isEmpty()){
+                    List<?> list02 = list01;
+                    //赋值还回来
+                    workbook = commonExcelCode(list02, workbook);
+                }
+            }
+            //缓冲区
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try {
+                workbook.write(baos);
+                bytes = baos.toByteArray();
+            } catch (IOException e) {
+                logger.error("", e);
+            } finally {
+                try {
+                    baos.close();
+                    workbook.close();
+                } catch (IOException e) {
+                    logger.error("", e);
+                }
+            }
+        }
+        return bytes;
+    }
+
+    /**
+     * 公用ExcelCode代码
+     * @param list02
+     * @param workbook
+     * @return
+     */
+    public static HSSFWorkbook commonExcelCode(List<?> list02, HSSFWorkbook workbook){
+        //获取对象
+        Object t0 = list02.get(0);
+        //获取反射对象
+        Class<?> t0Clazz = t0.getClass();
+        //反射对象注解
+        Excel excel = t0Clazz.getAnnotation(Excel.class);
+        //sheet名称
+        String sheetName = excel.sheetName();
+        //标题
+        String[] headers = excel.header();
+        int rowCount = 0;
+        //创建sheet
+        HSSFSheet sheet = workbook.createSheet(sheetName);
+        if (headers != null && headers.length > 0) {
+            //在工作表中创建一个新行并返回高级别表示  执行过后才+1
+            HSSFRow row = sheet.createRow(rowCount++);
+            //列数量 下标从0开始
+            int cellCount = 0;
+            for (String head : headers) {
+                HSSFCell cell = row.createCell(cellCount++);
+                cell.setCellValue(head);
+            }
+        }
+        //创建map集合存域
+        Map<String, Field> fieldMap = new HashMap<String, Field>(8);
+        Class tempClazz = t0Clazz;
+        do {
+            Field[] declaredFields = tempClazz.getDeclaredFields();
+            for (Field declaredField : declaredFields) {
+                fieldMap.put(declaredField.getName(), declaredField);
+            }
+            tempClazz = tempClazz.getSuperclass();
+        } while (!tempClazz.equals(Object.class));
+        //遍历集合
+        for (Object t : list02) {
+            //标题上面有了 开始数据
+            HSSFRow row = sheet.createRow(rowCount++);
+            //映射
+            for (Map.Entry<String, Field> entry : fieldMap.entrySet()) {
+                Field field = entry.getValue();
+                ExcelProperty excelProperty = field.getAnnotation(ExcelProperty.class);
+                if (excelProperty != null) {
+                    int index = excelProperty.index();
+                    Cell cell = row.createCell(index);
+                    Method method = null;
+                    try {
+                        method = t0Clazz.getMethod("get" + StringUtils.capitalize(field.getName()));
+                    } catch (NoSuchMethodException e) {
+                        try {
+                            method = t0Clazz.getMethod("is" + StringUtils.capitalize(field.getName()));
+                        } catch (NoSuchMethodException e1) {
+                            logger.error("no such method: {}", field.getName());
+                        }
+                    }
+                    String cellValue = null;
+                    try {
+                        cellValue = method.invoke(t).toString();
+                    } catch (Exception e) {
+                        cellValue = "";
+                    }
+                    cell.setCellValue(cellValue);
+                }
+            }
+        }
+        for (int colNum = 0; colNum < headers.length; colNum++) {
+            int columnWidth = sheet.getColumnWidth(colNum) / 256;
+            for (int rowNum = 0; rowNum < sheet.getLastRowNum(); rowNum++) {
+                HSSFRow currentRow;
+                //当前行未被使用过
+                if (sheet.getRow(rowNum) == null) {
+                    currentRow = sheet.createRow(rowNum);
+                } else {
+                    currentRow = sheet.getRow(rowNum);
+                }
+                if (currentRow.getCell(colNum) != null) {
+                    HSSFCell currentCell = currentRow.getCell(colNum);
+                    if (currentCell.getCellTypeEnum() == CellType.STRING) {
+                        int length = currentCell.getStringCellValue().getBytes().length;
+                        if (columnWidth < length) {
+                            columnWidth = length;
+                        }
+                    }
+                }
+            }
+            if (colNum == 0) {
+                sheet.setColumnWidth(colNum, (columnWidth - 2) * 256);
+            } else {
+                sheet.setColumnWidth(colNum, (columnWidth + 4) * 256);
+            }
         }
         return workbook;
     }

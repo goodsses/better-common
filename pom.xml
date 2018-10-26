@@ -8,6 +8,18 @@
     <artifactId>common</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <parent>
+
+        <groupId>org.springframework.boot</groupId>
+
+        <artifactId>spring-boot-starter-parent</artifactId>
+
+        <version>2.0.3.RELEASE</version>
+
+        <relativePath/> <!-- lookup parent from repository -->
+
+    </parent>
+
     <!--    版本号    -->
     <properties>
         <fastjson.version>1.2.47</fastjson.version>
@@ -19,6 +31,20 @@
     </properties>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.9.5</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.7</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.springframework/spring-web -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -68,7 +94,7 @@
             <version>${commons-beanutils.version}</version>
         </dependency>
 
-        <!--工具尺化技术包-->
+        <!--工具池化技术包-->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
@@ -89,6 +115,18 @@
             <version>1.7.25</version>
         </dependency>
 
+        <!--boot-web-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!--boot-test-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

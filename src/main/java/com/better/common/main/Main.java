@@ -16,6 +16,8 @@ import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @Auther: 梁晓宇
@@ -77,6 +79,11 @@ public class Main {
     }
 
     public static void main(String... args) {
+        String a="机会代码： 901239183 受理顺序： 123123";
+        String regEx = "[^0-9]";
+        Pattern p = Pattern.compile(regEx);
+        Matcher m = p.matcher(a);
+        System.out.println( m.replaceAll("---分隔线---").trim());
 
     }
 

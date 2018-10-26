@@ -4,8 +4,7 @@ import com.better.anno.bean.Excel;
 import com.better.anno.bean.ExcelProperty;
 
 /**
- * @author pch 651158394@qq.com
- * @version 2018/8/29 17:43
+ * 测试实体类
  */
 @Excel(header = {"绑定时间", "奖品名称", "手机号", "收件人", "详细地址"}, sheetName = "奖品地址")
 public class AwardMailAddress {

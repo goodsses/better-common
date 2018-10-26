@@ -3,8 +3,9 @@ package com.better.anno.bean;
 import java.lang.annotation.*;
 
 /**
- * @author pch 651158394@qq.com
- * @version 2018/8/30 9:04
+ * @Auther: 梁晓宇
+ * @Date: 2018/10/25 17:36
+ * @Description: 自定义POI接口
  */
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

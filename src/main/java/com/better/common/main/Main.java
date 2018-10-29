@@ -1,13 +1,10 @@
 package com.better.common.main;
 
 import com.better.anno.bean.Excel;
-import com.better.common.excel.PoiUtils;
-import com.better.common.excel.entity.AwardMailAddress;
-import com.better.common.excel.entity.testExcel;
-import org.apache.poi.ss.formula.functions.T;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import com.better.common.file.PdfUtils;
+import com.better.common.file.PoiUtils;
+import com.better.common.file.entity.AwardMailAddress;
+import com.better.common.file.entity.testExcel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +25,12 @@ import java.util.regex.Pattern;
 @RequestMapping("/xy/web")
 public class Main {
 
+
+
+    @RequestMapping("/pdf.do")
+    public void writePdf(){
+        PdfUtils.exportPdfFile();
+    }
 
     @RequestMapping("/down")
     public ResponseEntity<byte[]> down() throws Exception {

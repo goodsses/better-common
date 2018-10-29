@@ -1,4 +1,4 @@
-package com.better.common.excel.entity;
+package com.better.common.file.entity;
 
 import com.better.anno.bean.Excel;
 import com.better.anno.bean.ExcelProperty;

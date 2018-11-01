@@ -5,7 +5,10 @@ import com.better.common.file.PdfUtils;
 import com.better.common.file.PoiUtils;
 import com.better.common.file.entity.AwardMailAddress;
 import com.better.common.file.entity.testExcel;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,16 +26,18 @@ import java.util.regex.Pattern;
  */
 @RestController
 @RequestMapping("/xy/web")
+@Api(tags = "xy（测试类）")
 public class Main {
 
 
-
-    @RequestMapping("/pdf.do")
+    @GetMapping("/pdf")
+    @ApiOperation(value = "pdf", notes = "xy")
     public void writePdf(){
         PdfUtils.exportPdfFile();
     }
 
-    @RequestMapping("/down")
+    @GetMapping("/down")
+    @ApiOperation(value = "down", notes = "xy")
     public ResponseEntity<byte[]> down() throws Exception {
         List<List<?>> tList = new ArrayList<>();
         List<AwardMailAddress> list = new ArrayList<AwardMailAddress>();
@@ -65,7 +70,8 @@ public class Main {
         return PoiUtils.downToExcelMore(tList,"多sheet测试文件.xls", "ISO8859-1");
     }
 
-    @RequestMapping("/dan")
+    @GetMapping("/dan")
+    @ApiOperation(value = "dan", notes = "xy")
     public ResponseEntity<byte[]> dan() throws UnsupportedEncodingException {
         //单个sheet测试数据
         List<AwardMailAddress> list = new ArrayList<AwardMailAddress>();
@@ -81,12 +87,19 @@ public class Main {
         return PoiUtils.downToExcel(list, "测试文件.xls", "ISO8859-1");
     }
 
-    public static void main(String... args) {
+    @GetMapping("gsg")
+    @ApiOperation(value = "gsg", notes = "xy")
+    public String gsg(){
         String a="机会代码： 901239183 受理顺序： 123123";
         String regEx = "[^0-9]";
         Pattern p = Pattern.compile(regEx);
         Matcher m = p.matcher(a);
         System.out.println( m.replaceAll("---分隔线---").trim());
+        return m.replaceAll("").trim();
+    }
+
+    public static void main(String... args) {
+
 
     }
 

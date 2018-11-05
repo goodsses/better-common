@@ -1,21 +1,34 @@
 package com.better.common.main;
 
 import com.better.anno.bean.Excel;
+import com.better.anno.bean.TableImageJPGE;
+import com.better.anno.bean.TableImageJPGEProperty;
 import com.better.common.file.PdfUtils;
 import com.better.common.file.PoiUtils;
 import com.better.common.file.entity.AwardMailAddress;
 import com.better.common.file.entity.testExcel;
+import com.better.common.image.TableImageUtils;
+import com.better.common.image.entity.ImgDO;
+import com.sun.image.codec.jpeg.JPEGCodec;
+import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -99,7 +112,32 @@ public class Main {
     }
 
     public static void main(String... args) {
+        Main cg = new Main();
 
+        List<ImgDO> imgDOList = new ArrayList<>();
+        ImgDO imgDO = new ImgDO();
+        imgDO.setId("1");
+        imgDO.setName("tom");
+        imgDO.setAge("18");
+        imgDO.setCreateTime("2012-08-08");
+        imgDOList.add(imgDO);
+        ImgDO imgDO1 = new ImgDO();
+        imgDO1.setId("2");
+        imgDO1.setName("John");
+        imgDO1.setAge("22");
+        imgDO1.setCreateTime("2012-08-11");
+        imgDOList.add(imgDO1);
+        ImgDO imgDO2 = new ImgDO();
+        imgDO2.setId("3");
+        imgDO2.setName("Jssion");
+        imgDO2.setAge("25");
+        imgDO2.setCreateTime("2012-08-29");
+        imgDOList.add(imgDO2);
+        try {
+            TableImageUtils.myGraphicsGeneration(imgDOList, "d:\\JoinSoft\\myPic.jpg","高傻妞", "宋体", 1024, 40);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
